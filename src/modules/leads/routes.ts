@@ -1,7 +1,10 @@
 import { FastifyInstance } from 'fastify';
+import { LeadsController } from './controllers/leads.controller'
 
 export async function leadsRoutes(app: FastifyInstance) {
-  app.post('/leads', async (request, reply) => {
-    return { message: 'Lead criado (mock)' };
-  });
+  const controller = new LeadsController();
+
+  app.get('/leads', controller.index);
+
+  app.post('/leads', controller.create);
 }
