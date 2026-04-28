@@ -2,7 +2,7 @@ import { ConflictError } from "@/shared/errors/conflict-error";
 import { CreateLeadDTO } from "../dtos/create-lead.dto";
 import { LeadsRepository } from "../repositories/leads.repository";
 import { createLeadSchema } from "../schemas/create-lead.schema";
-import { isPhone } from "brazilian-values";
+import { leadQueue } from "../queue/lead.queue";
 
 
 export class CreateLeadService {
@@ -19,6 +19,17 @@ export class CreateLeadService {
         }
 
         const lead = await this.leadRepository.create(parsed);
+
+        await leadQueue.add("process-lead", lead, {
+            jobId: lead.email,
+            attempts: 3,
+            backoff: {
+                type: "exponential",
+                delay: 1000,
+            },
+            removeOnComplete: true,
+            removeOnFail: false
+        });
 
         return lead;
     }
