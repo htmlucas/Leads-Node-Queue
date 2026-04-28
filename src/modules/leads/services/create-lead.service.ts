@@ -2,6 +2,7 @@ import { ConflictError } from "@/shared/errors/conflict-error";
 import { CreateLeadDTO } from "../dtos/create-lead.dto";
 import { LeadsRepository } from "../repositories/leads.repository";
 import { createLeadSchema } from "../schemas/create-lead.schema";
+import { isPhone } from "brazilian-values";
 
 
 export class CreateLeadService {

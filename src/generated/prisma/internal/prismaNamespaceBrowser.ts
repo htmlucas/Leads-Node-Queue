@@ -97,7 +97,9 @@ export const LeadScalarFieldEnum = {
   email: 'email',
   name: 'name',
   phone: 'phone',
-  consent: 'consent'
+  consent: 'consent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type LeadScalarFieldEnum = (typeof LeadScalarFieldEnum)[keyof typeof LeadScalarFieldEnum]
