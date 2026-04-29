@@ -26,9 +26,7 @@ export class CreateLeadService {
             backoff: {
                 type: "exponential",
                 delay: 1000,
-            },
-            removeOnComplete: true,
-            removeOnFail: false
+            }
         });
 
         return lead;

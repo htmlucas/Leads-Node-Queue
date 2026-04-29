@@ -22,6 +22,7 @@
     "bullmq": "^5.76.3",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
+    "handlebars": "^4.7.9",
     "ioredis": "^5.10.1",
     "nodemailer": "^8.0.7",
     "pg": "^8.20.0",
