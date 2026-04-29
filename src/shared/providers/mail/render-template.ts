@@ -1,21 +1,32 @@
-import fs from 'fs'
-import path from 'path'
-import handlebars from 'handlebars'
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
 
 export function renderTemplate(templateName: string, data: any) {
-  const filePath = path.resolve(
-    __dirname,
-    'templates',
-    `${templateName}.hbs`
-  )
+  const basePath = path.resolve(
+    process.cwd(),
+    "src/shared/providers/mail/templates"
+  );
 
-  const templateFile = fs.readFileSync(filePath, 'utf-8')
+  // template específico
+  const templateFile = fs.readFileSync(
+    path.join(basePath, `${templateName}.hbs`),
+    "utf-8"
+  );
 
-  const compileTemplate = handlebars.compile(templateFile)
+  const templateCompiled = handlebars.compile(templateFile);
+  const content = templateCompiled(data);
 
-  return compileTemplate(data)
+  // layout
+  const layoutFile = fs.readFileSync(
+    path.join(basePath, "layouts/main.hbs"),
+    "utf-8"
+  );
+
+  const layoutCompiled = handlebars.compile(layoutFile);
+
+  return layoutCompiled({
+    ...data,
+    body: content,
+  });
 }
