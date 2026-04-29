@@ -1,6 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { Lead, Prisma } from '@/generated/prisma/client'
 
+interface IFilters {
+    email?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+interface IFindAll {
+  offset: number;
+  limit: number;
+  filters: IFilters;
+}
+
 const leads: Lead[] = [];
 
 export class LeadsRepository {
@@ -19,9 +31,46 @@ export class LeadsRepository {
         });
     }
 
-    async findAll(): Promise<Lead[]> {
-        const leads = await prisma.lead.findMany();
+    async findAll({ offset, limit, filters }: IFindAll ): Promise<Lead[]> {
+        const leads = await prisma.lead.findMany({
+            where: this.buildWhere(filters),
+            skip: offset,
+            take: limit,
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
 
         return leads;
+    }
+
+    private buildWhere(filters: IFilters){
+        const where: any = {};
+
+        if (filters.email) {
+            where.email = {
+                contains: filters.email,
+                mode: "insensitive"
+            };
+        }
+
+        if (filters.startDate || filters.endDate) {
+            where.createdAt = {};
+
+            if (filters.startDate) {
+                where.createdAt.gte = new Date(filters.startDate);
+            }
+
+            if (filters.endDate) {
+                where.createdAt.lte = new Date(filters.endDate)
+            }
+        }
+
+        return where;
+    }
+
+    async count()
+    {
+        return prisma.lead.count();
     }
 }

@@ -4,14 +4,30 @@ import { CreateLeadService } from "../services/create-lead.service";
 import { ListLeadsService } from "../services/list-leads.services";
 import { LeadsRepository } from "../repositories/leads.repository";
 
+type ListLeadsQuery = {
+  page?: string;
+  limit?: string;
+  email? : string;
+  startDate?: string;
+  endDate?: string;
+};
+
 export class LeadsController {
 
-    async index (request: FastifyRequest, reply: FastifyReply) {
+    async index (request: FastifyRequest<{ Querystring: ListLeadsQuery }>, reply: FastifyReply) {
 
         const repository = new LeadsRepository();
         const service = new ListLeadsService(repository);
 
-        const response = await service.execute();
+        const { page = 1, limit = 10, email, startDate, endDate } = request.query;
+
+        const response = await service.execute({
+            page: Number(page),
+            limit: Number(limit),
+            email,
+            startDate,
+            endDate
+        });
 
         return reply.status(200).send(response);
     }
