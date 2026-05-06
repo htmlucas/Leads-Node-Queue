@@ -3,6 +3,7 @@ import { CreateLeadDTO } from "../dtos/create-lead.dto";
 import { CreateLeadService } from "../services/create-lead.service";
 import { ListLeadsService } from "../services/list-leads.services";
 import { LeadsRepository } from "../repositories/leads.repository";
+import { CsvExportLeadService } from "@/shared/services/export/csv-export-lead.service";
 
 type ListLeadsQuery = {
   page?: string;
@@ -47,5 +48,18 @@ export class LeadsController {
         })
 
         return reply.status(200).send(response);
+    }
+
+    async export(request: FastifyRequest,reply: FastifyReply) {
+        reply.header('Content-Type', 'text/csv');
+        reply.header(
+            'Content-Disposition',
+            'attachment; filename="leads.csv"'
+        );
+
+        const repository = new LeadsRepository();
+        const service = new CsvExportLeadService(repository);
+
+        await service.exportLeads(reply);
     }
 }
