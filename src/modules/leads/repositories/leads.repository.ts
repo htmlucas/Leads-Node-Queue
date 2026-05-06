@@ -69,8 +69,18 @@ export class LeadsRepository {
         return where;
     }
 
-    async count()
-    {
+    async count(){
         return prisma.lead.count();
+    }
+
+    async findForExport(cursor?: number, limit: number = 5) {
+        return prisma.lead.findMany({
+            take: limit,
+            ...(cursor && {
+                cursor: { id: cursor },
+                skip: 1,
+            }),
+            orderBy: { id: 'asc' },
+        });
     }
 }
