@@ -13,6 +13,12 @@ type ListLeadsQuery = {
   endDate?: string;
 };
 
+type LeadsExportQuery = {
+    email?: string;
+    startDate?: Date;
+    endDate?: Date;
+}
+
 export class LeadsController {
 
     async index (request: FastifyRequest<{ Querystring: ListLeadsQuery }>, reply: FastifyReply) {
@@ -50,16 +56,18 @@ export class LeadsController {
         return reply.status(200).send(response);
     }
 
-    async export(request: FastifyRequest,reply: FastifyReply) {
+    async export(request: FastifyRequest<{ Querystring: LeadsExportQuery }>,reply: FastifyReply) {
         reply.header('Content-Type', 'text/csv');
         reply.header(
             'Content-Disposition',
             'attachment; filename="leads.csv"'
         );
 
+        const { email, startDate, endDate } = request.query;
+
         const repository = new LeadsRepository();
         const service = new CsvExportLeadService(repository);
 
-        await service.exportLeads(reply);
+        await service.exportLeads({ reply, email, startDate, endDate });
     }
 }

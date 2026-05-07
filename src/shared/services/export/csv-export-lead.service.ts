@@ -1,14 +1,23 @@
 
 import { LeadsRepository } from '@/modules/leads/repositories/leads.repository';
 import { stringify } from 'csv-stringify';
+import { FastifyReply } from 'fastify';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
+
+type LeadsExport = {
+  reply: FastifyReply,
+  email?: string;
+  startDate?: Date;
+  endDate?: Date;
+}
 
 export class CsvExportLeadService {
 
     constructor(private leadRepository: LeadsRepository) {}
     
-  async exportLeads(reply: any) {
+  async exportLeads( { reply, email, startDate, endDate }:LeadsExport  ) {
+
     let cursor: number | undefined = undefined;
     const batchSize = 500;
     const repo = this.leadRepository;
@@ -30,7 +39,10 @@ export class CsvExportLeadService {
 
             const leads = await repo.findForExport(
                 cursor,
-                batchSize
+                batchSize,
+                email,
+                startDate,
+                endDate
             );
 
             if (leads.length === 0) {

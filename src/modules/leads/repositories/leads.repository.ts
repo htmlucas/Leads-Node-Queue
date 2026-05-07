@@ -73,13 +73,32 @@ export class LeadsRepository {
         return prisma.lead.count();
     }
 
-    async findForExport(cursor?: number, limit: number = 5) {
+    async findForExport(cursor?: number, limit: number = 5, email?: string, startDate?: Date, endDate?: Date) {
         return prisma.lead.findMany({
             take: limit,
+
             ...(cursor && {
                 cursor: { id: cursor },
                 skip: 1,
             }),
+
+            where:{
+                ...(email && { 
+                    email: {
+                        contains: email,
+                        mode: 'insensitive',
+                    },
+                }),
+
+                ...( startDate && 
+                    endDate && {
+                        createdAt: {
+                            gte: startDate,
+                            lte: endDate
+                        },
+                    }),
+            },
+
             orderBy: { id: 'asc' },
         });
     }
